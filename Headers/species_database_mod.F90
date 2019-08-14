@@ -4533,7 +4533,8 @@ CONTAINS
           !==================================================================
 
           CASE( 'CO2',    'CO2FF', 'CO2OC', 'CO2BAL', 'CO2BB', 'CO2BF',     &
-                'CO2NTE', 'CO2SE', 'CO2AV', 'CO2CH',  'CO2CORR'         )
+                'CO2NTE', 'CO2SE', 'CO2AV', 'CO2CH',  'CO2CORR',            &
+                'CO2GLBBB', 'CO2GLBGPP', 'CO2GLBRESP')
 
              ! These all have identical properties except for the names
              ! Add TOMAS bin number to full name
@@ -4559,6 +4560,12 @@ CONTAINS
                    FullName = 'Carbon dioxide from chemical sources'
                 CASE( 'CO2CORR' )
                    FullName = 'Carbon dioxide chemical source surface correction'
+                CASE( 'CO2GLBBB' )
+                   FullName = 'Carbon dioxide from biomass burning worldwide'
+                CASE( 'CO2GLBGPP' )
+                   FullName = 'Carbon dioxide uptake due to gross primary productivity worldwide'
+                CASE( 'CO2GlbResp' )
+                   FullName = 'Carbon dioxide from respiration worldwide'
                 CASE DEFAULT
                    FullName = 'Carbon dioxide'
              END SELECT
