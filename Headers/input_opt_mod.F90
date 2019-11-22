@@ -509,6 +509,14 @@ MODULE Input_Opt_Mod
 #endif
 
      !----------------------------------------
+     ! GCHP adjoint fields
+     !---------------------------------------
+     LOGICAL                     :: IS_FD_SPOT
+     INTEGER                     :: FD_STEP
+     LOGICAL                     :: IS_FD_SPOT_THIS_PET
+     INTEGER                     :: IFD, JFD, NFD, LFD
+
+     !----------------------------------------
      ! Fields for LINOZ strat chem
      !----------------------------------------
      INTEGER                     :: LINOZ_NLEVELS
