@@ -511,10 +511,11 @@ MODULE Input_Opt_Mod
      !----------------------------------------
      ! GCHP adjoint fields
      !---------------------------------------
-     LOGICAL                     :: IS_FD_SPOT
+     LOGICAL                     :: IS_ADJOINT
+     LOGICAL                     :: IS_FD_SPOT, IS_FD_GLOBAL
      INTEGER                     :: FD_STEP
      LOGICAL                     :: IS_FD_SPOT_THIS_PET
-     INTEGER                     :: IFD, JFD, NFD, LFD
+     INTEGER                     :: IFD, JFD, NFD, LFD, NFD_ADJ
 
      !----------------------------------------
      ! Fields for LINOZ strat chem
@@ -1343,6 +1344,20 @@ CONTAINS
     Input_Opt%haveImpRst             = .FALSE.
     Input_Opt%AlwaysSetH2O           = .FALSE.
 #endif
+
+    !----------------------------------------
+    ! Fields for adoint
+    !---------------------------------------
+    Input_Opt%IS_ADJOINT             = .FALSE.
+    Input_Opt%IS_FD_SPOT             = .FALSE.
+    Input_Opt%IS_FD_GLOBAL           = .FALSE.
+    Input_Opt%IS_FD_SPOT_THIS_PET    = .FALSE.
+    Input_Opt%FD_STEP                = -999
+    Input_Opt%IFD                    = -999
+    Input_Opt%JFD                    = -999
+    Input_Opt%NFD                    = -999
+    Input_Opt%LFD                    = -999
+
 
     !----------------------------------------
     ! Fields for LINOZ strat chem

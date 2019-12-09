@@ -4534,7 +4534,7 @@ CONTAINS
 
           CASE( 'CO2',    'CO2FF', 'CO2OC', 'CO2BAL', 'CO2BB', 'CO2BF',     &
                 'CO2NTE', 'CO2SE', 'CO2AV', 'CO2CH',  'CO2CORR',            &
-                'CO2GLBBB', 'CO2GLBGPP', 'CO2GLBRESP')
+                'CO2GLBBB', 'CO2GLBGPP', 'CO2GLBRESP', 'CO2ADJ')
 
              ! These all have identical properties except for the names
              ! Add TOMAS bin number to full name
@@ -4566,6 +4566,8 @@ CONTAINS
                    FullName = 'Carbon dioxide uptake due to gross primary productivity worldwide'
                 CASE( 'CO2GlbResp' )
                    FullName = 'Carbon dioxide from respiration worldwide'
+                CASE( 'CO2ADJ' )
+                   FullName = 'Adjoint of carbon dioxide tracer'
                 CASE DEFAULT
                    FullName = 'Carbon dioxide'
              END SELECT
