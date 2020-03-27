@@ -110,6 +110,10 @@ MODULE State_Chm_Mod
                                                         !  [kg/kg dry air]
      CHARACTER(LEN=20)          :: Spc_Units            ! Species units
 
+#ifdef ADJOINT
+     REAL(fp),          POINTER :: SpeciesAdj (:,:,:,:) ! Species adjoint variables
+#endif
+
      !----------------------------------------------------------------------
      ! Boundary conditions
      !----------------------------------------------------------------------
@@ -427,6 +431,11 @@ CONTAINS
     ! Chemical species
     State_Chm%Species       => NULL()
     State_Chm%Spc_Units     = ''
+
+#ifdef ADJOINT
+    ! Chemical species adjoint variables
+    State_Chm%SpeciesAdj    => NULL()
+#endif
 
     ! Boundary conditions
     State_Chm%BoundaryCond  => NULL()
@@ -820,6 +829,20 @@ CONTAINS
     CALL Register_ChmField( am_I_Root, chmID, State_Chm%Species, State_Chm, RC )
     CALL GC_CheckVar( 'State_Chm%Species', 1, RC )
     IF ( RC /= GC_SUCCESS ) RETURN
+
+#ifdef ADJOINT
+    !=======================================================================
+    ! Allocate and initialize adjoint variables
+    !======================================================================= 
+    chmID = 'SpeciesAdj'
+    ALLOCATE( State_Chm%SpeciesAdj( IM, JM, LM, State_Chm%nSpecies ), STAT=RC )
+    CALL GC_CheckVar( 'State_Chm%SpeciesAdj', 0, RC )
+    IF ( RC /= GC_SUCCESS ) RETURN
+    State_Chm%SpeciesAdj = 0.0_fp
+    CALL Register_ChmField( am_I_Root, chmID, State_Chm%SpeciesAdj, State_Chm, RC )
+    CALL GC_CheckVar( 'State_Chm%SpeciesAdj', 1, RC )
+    IF ( RC /= GC_SUCCESS ) RETURN
+#endif
 
     !=======================================================================
     ! Allocate and initialize boundary condition fields
@@ -2228,7 +2251,13 @@ CONTAINS
           IF ( isUnits   ) Units = 'varies'
           IF ( isRank    ) Rank  = 3
           IF ( isSpecies ) PerSpecies = 'ALL'
-
+#ifdef ADJOINT
+       CASE ( 'SPECIESADJ' )
+          IF ( isDesc    ) Desc  = 'Adjoint variables for species'
+          IF ( isUnits   ) Units = 'varies'
+          IF ( isRank    ) Rank  = 3
+          IF ( isSpecies ) PerSpecies = 'ALL'
+#endif
        CASE( 'BOUNDARYCOND' )
           IF ( isDesc    ) Desc  = 'Boundary conditions for species'
           IF ( isUnits   ) Units = 'v/v'

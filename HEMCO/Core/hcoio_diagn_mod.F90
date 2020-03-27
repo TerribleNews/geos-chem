@@ -113,6 +113,7 @@ CONTAINS
 
     ! To write restart (enforced)
     IF ( RESTART ) THEN
+       if (am_i_root) WRITE(*,*) "Doing HCOIO_DIAGN_WRITEOUT for restart"
        CALL HCOIO_DIAGN_WRITEOUT ( am_I_Root,                              &
                                    HcoState,                               &
                                    ForceWrite  = .TRUE.,                   &
@@ -121,10 +122,12 @@ CONTAINS
                                    RC          = RC                         )
        IF( RC /= HCO_SUCCESS) RETURN 
 
+       if (am_i_root) WRITE(*,*) "HcoClock_SetLast"
        ! Set last flag for use below
        CALL HcoClock_SetLast ( am_I_Root, HcoState%Clock, .TRUE., RC )
        IF( RC /= HCO_SUCCESS) RETURN 
 
+       if (am_i_root) WRITE(*,*) "Doing HCOIO_DIAGN_WRITEOUT default column"
        CALL HCOIO_DIAGN_WRITEOUT ( am_I_Root,                              &
                                    HcoState,                               &
                                    ForceWrite  = .FALSE.,                  &
@@ -133,6 +136,7 @@ CONTAINS
                                    RC          = RC                         )
        IF( RC /= HCO_SUCCESS) RETURN 
 
+       if (am_i_root) WRITE(*,*) "HcoClock_SetLast"
        ! Reset IsLast flag. This is to ensure that the last flag is not 
        ! carried over (ckeller, 11/1/16). 
        CALL HcoClock_SetLast ( am_I_Root, HcoState%Clock, .FALSE., RC )
@@ -166,6 +170,7 @@ CONTAINS
           ! HCO_RestartWrite. (ckeller, 10/9/17)
           IF ( I == 2 ) CYCLE
 #endif 
+          if (am_i_root) WRITE(*,*) "Doing HCOIO_DIAGN_WRITEOUT, I = ", I
  
           ! Restart file 
           CALL HCOIO_DIAGN_WRITEOUT ( am_I_Root,                       &

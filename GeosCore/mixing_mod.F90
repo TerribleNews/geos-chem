@@ -542,6 +542,11 @@ CONTAINS
     ELSE
        TS = GET_TS_DYN()
     ENDIF
+#ifdef ADJOINT
+    if (Input_Opt%Is_Adjoint) then
+       TS = TS * -1
+    endif
+#endif
 
     ! First-time setup
     IF ( FIRST ) THEN
@@ -792,6 +797,12 @@ CONTAINS
                    State_Chm%Species(I,J,L,N) = FRAC *    &
                                                 State_Chm%Species(I,J,L,N)
 
+#ifdef ADJOINT
+                   if (Input_Opt%Is_Adjoint) then
+                      State_Chm%SpeciesAdj(I,J,L,N) = FRAC *  &
+                           State_Chm%SpeciesAdj(I,J,L,N)
+                   endif
+#endif
                    ! Eventually add PARANOX loss. PNOXLOSS is in kg/m2/s.
                    ! Make sure PARANOx loss is applied to tracers. (ckeller,
                    ! 3/29/16).
@@ -901,6 +912,11 @@ CONTAINS
                    ! Add to species array
                    State_Chm%Species(I,J,L,N) = State_Chm%Species(I,J,L,N) & 
                                               + FLUX 
+#ifdef ADJOINT
+                   if (Input_Opt%Is_Adjoint) then
+                      ! the adjoint of this should be do nothing...?
+                   endif
+#endif
                 ENDIF
              ENDIF
 

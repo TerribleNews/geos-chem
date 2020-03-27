@@ -421,10 +421,25 @@ CONTAINS
     ! Set misc. parameter
     !=======================================================================
 
+#ifdef ADJOINT
+    if ( am_I_Root ) WRITE(*,*) 'Setting isAdjoint to ', Input_Opt%is_adjoint
+    HcoState%isAdjoint = Input_opt%is_adjoint
+    if ( .not. HcoState%isAdjoint ) THEN
+#endif
     ! Emission, chemistry and dynamics timestep in seconds
     HcoState%TS_EMIS = GET_TS_EMIS()
     HcoState%TS_CHEM = GET_TS_CHEM()
     HcoState%TS_DYN  = GET_TS_DYN()
+#ifdef ADJOINT
+    else
+    ! Emission, chemistry and dynamics timestep in seconds
+    HcoState%TS_EMIS = -GET_TS_EMIS()
+    HcoState%TS_CHEM = -GET_TS_CHEM()
+    HcoState%TS_DYN  = -GET_TS_DYN()
+    ! Look into whether we want to change the sign in the body of GET_TS_*()
+    endif
+#endif
+
 
     ! Is this an ESMF simulation or not?
     ! The ESMF flag must be set before calling HCO_Init because the

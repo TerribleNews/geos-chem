@@ -1930,6 +1930,7 @@ CONTAINS
                 IF ( AS /= 0 ) THEN
                    CALL HCO_ERROR( HcoState%Config%Err,&
                                    'Allocation error Arr3D', RC, THISLOC=LOC )
+                   if (am_I_Root) WRITE(*,*) 'Allocation error Arr3D_HP'
                    RETURN
                 ENDIF
                 Arr3D = Array3D_HP
@@ -1938,6 +1939,7 @@ CONTAINS
                 IF ( AS /= 0 ) THEN
                    CALL HCO_ERROR( HcoState%Config%Err,&
                                    'Allocation error Arr3D', RC, THISLOC=LOC )
+                   if (am_I_Root) WRITE(*,*) 'Allocation error Arr3D'
                    RETURN
                 ENDIF
                 Arr3D = Array3D
@@ -1951,6 +1953,7 @@ CONTAINS
                 IF ( AS /= 0 ) THEN
                    CALL HCO_ERROR( HcoState%Config%Err,&
                                    'Allocation error Arr2D', RC, THISLOC=LOC )
+                   if (am_I_Root) WRITE(*,*) 'Allocation error Arr2D_HP'
                    RETURN
                 ENDIF
                 Arr2D = Array2D_HP
@@ -1959,6 +1962,7 @@ CONTAINS
                 IF ( AS /= 0 ) THEN
                    CALL HCO_ERROR( HcoState%Config%Err,&
                                    'Allocation error Arr2D', RC, THISLOC=LOC )
+                   if (am_I_Root) WRITE(*,*) 'Allocation error Arr2D'
                    RETURN
                 ENDIF
                 Arr2D = Array2D
@@ -2055,6 +2059,7 @@ CONTAINS
                    ENDIF
                 ELSE
                    MSG = 'No array passed for updating ' // TRIM(ThisDiagn%cName)
+                   if (am_I_Root) WRITE(*,*) MSG
                    CALL HCO_ERROR ( HcoState%Config%Err, MSG, RC, THISLOC=LOC )
                    RETURN
                 ENDIF
@@ -2306,6 +2311,7 @@ CONTAINS
     ! Get collection number
     CALL DiagnCollection_DefineID( HcoState%Diagn, PS, RC, COL=COL, &
                                    ThisColl=ThisColl, HcoState=HcoState )
+    IF ( RC /= HCO_SUCCESS .and. am_I_Root) WRITE(*,*) 'Failed to get collection number ', col
     IF ( RC /= HCO_SUCCESS ) RETURN
 
     ! Set AutoFill flag
@@ -2388,6 +2394,7 @@ CONTAINS
     ! Before returning container, make sure its data is ready for output.
     IF ( ASSOCIATED (DgnCont ) ) THEN
        CALL DiagnCont_PrepareOutput ( am_I_Root, HcoState, DgnCont, RC ) 
+       IF ( RC /= HCO_SUCCESS .and. am_I_Root ) WRITE(*,*) 'DiagnCont_PrepareOutput returned RC: ', RC, ' for Col: ', DgnCont%CollectionID
        IF ( RC /= HCO_SUCCESS ) RETURN
        FLAG = HCO_SUCCESS
 
@@ -3001,12 +3008,14 @@ CONTAINS
     !-----------------------------------------------------------------------
     CALL DiagnCollection_Find( HcoState%Diagn, DgnCont%CollectionID, &
                                FOUND, RC, ThisColl=ThisColl )
+    IF ( RC /= HCO_SUCCESS .and. am_I_Root ) WRITE(*,*) 'DiagnCollection_Find failed'
     IF ( RC /= HCO_SUCCESS ) RETURN
 
     ! This should never happen
     IF ( .NOT. FOUND .OR. .NOT. ASSOCIATED(ThisColl) ) THEN
        WRITE(MSG,*) 'Diagnostics ', TRIM(DgnCont%cName), ' has invalid ', &
                     'collection ID of ', DgnCont%CollectionID
+       if (am_I_Root) WRITE(*,*) MSG
        CALL HCO_ERROR( HcoState%Config%Err, MSG, RC, THISLOC=LOC )
        RETURN
     ENDIF
@@ -3020,6 +3029,7 @@ CONTAINS
        IF ( DgnCont%SpaceDim == 2 ) THEN
           CALL HCO_ArrAssert( DgnCont%Arr2D, ThisColl%NX, &
                               ThisColl%NY,   RC            ) 
+          IF ( RC /= HCO_SUCCESS .and. am_I_Root ) WRITE(*,*) 'HCO_ArrAssert 2d failed'
           IF ( RC /= HCO_SUCCESS ) RETURN 
 
           ! Make sure it's zero
@@ -3028,6 +3038,7 @@ CONTAINS
        ELSEIF ( DgnCont%SpaceDim == 3 ) THEN
           CALL HCO_ArrAssert( DgnCont%Arr3D, ThisColl%NX, &
                               ThisColl%NY,   ThisColl%NZ, RC ) 
+          IF ( RC /= HCO_SUCCESS .and. am_I_Root ) WRITE(*,*) 'HCO_ArrAssert 3d failed'
           IF ( RC /= HCO_SUCCESS ) RETURN 
 
           ! Make sure it's zero
@@ -3075,6 +3086,7 @@ CONTAINS
        ! Get current month and year
        CALL HcoClock_Get( am_I_Root, HcoState%Clock, &
                           cYYYY=YYYY, cMM=MM, RC=RC )
+       IF ( RC /= HCO_SUCCESS .and. am_I_Root ) WRITE(*,*) 'HcoClock_Get failed'
        IF ( RC /= HCO_SUCCESS ) RETURN
 
        ! Days per year
@@ -3108,6 +3120,7 @@ CONTAINS
        ELSE
           WRITE(MSG,*) 'Illegal time averaging of ', DgnCont%TimeAvg, &
                        ' for diagnostics ', TRIM(DgnCont%cName)
+          if (am_I_Root) WRITE(*,*) TRIM(MSG)
           CALL HCO_ERROR( HcoState%Config%Err, MSG, RC, THISLOC=LOC )
           RETURN
        ENDIF
@@ -3117,6 +3130,7 @@ CONTAINS
     ! Error trap
     IF ( norm1 <= 0.0_hp ) THEN
        MSG = 'Illegal normalization factor: ' // TRIM(DgnCont%cName)
+       if (am_I_Root) WRITE(*,*) TRIM(MSG)
        CALL HCO_ERROR( HcoState%Config%Err, MSG, RC, THISLOC=LOC )
        RETURN
     ENDIF

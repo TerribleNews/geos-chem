@@ -435,6 +435,19 @@ ifeq ($(shell [[ "$(EXTERNAL_FORCING)" =~ $(REGEXP) ]] && echo true),true)
 endif
 
 #------------------------------------------------------------------------------
+# GCHP Adoint settings
+#------------------------------------------------------------------------------
+REGEXP               :=(^[Yy]|^[Yy][Ee][Ss])
+ifeq ($(shell [[ "$(ADJOINT)" =~ $(REGEXP) ]] && echo true),true)
+  USER_DEFS          += -DADJOINT
+endif
+
+REGEXP               :=(^[Yy]|^[Yy][Ee][Ss])
+ifeq ($(shell [[ "$(REVERSE_OPERATORS)" =~ $(REGEXP) ]] && echo true),true)
+  USER_DEFS          += -DREVERSE_OPERATORS
+endif
+
+#------------------------------------------------------------------------------
 # Coupling GEOS-Chem to External Models settings
 #------------------------------------------------------------------------------
 
