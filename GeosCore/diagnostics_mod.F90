@@ -29,6 +29,7 @@ MODULE Diagnostics_mod
   PUBLIC :: Zero_Diagnostics_StartofTimestep
   PUBLIC :: Compute_Column_Mass
   PUBLIC :: Compute_Budget_Diagnostics
+  PUBLIC :: Set_SpcAdj_Diagnostic
 !
 ! !PRIVATE MEMBER FUNCTIONS
 !
@@ -171,6 +172,10 @@ CONTAINS
     ! Set species concentration diagnostic in units specified in state_diag_mod
     !-----------------------------------------------------------------------
     IF ( State_Diag%Archive_SpeciesAdj ) THEN
+       if (Input_Opt%IS_FD_SPOT_THIS_PET) THEN
+          write(*,*) 'Before diagnostic ',  &
+               State_Chm%SpeciesAdj(Input_Opt%IFD,Input_Opt%JFD,Input_Opt%LFD,Input_opt%NFD)
+       ENDIF
        CALL Set_SpcAdj_Diagnostic( am_I_Root, 'SpeciesAdj',                 &
                                    State_Diag%SpeciesAdj,                   &
                                    Input_Opt,  State_Chm,                   &
@@ -546,7 +551,10 @@ CONTAINS
        CALL Convert_Spc_Units( am_I_Root,  Input_Opt, State_Chm, &
                                State_grid, State_Met, Units,     &
                                RC,         OrigUnit=OrigUnit )
-       
+       if (Input_Opt%IS_FD_SPOT_THIS_PET) THEN
+          write(*,*) 'After Convert_Spc_Units to ',  trim(units), &
+               State_Chm%SpeciesAdj(Input_Opt%IFD,Input_Opt%JFD,Input_Opt%LFD,Input_opt%NFD)
+       ENDIF       
        ! Copy species concentrations to diagnostic array
        !$OMP PARALLEL DO           &
        !$OMP DEFAULT( SHARED     ) &
@@ -565,6 +573,11 @@ CONTAINS
        ! Convert State_Chm%Species back to original unit
        CALL Convert_Spc_Units( am_I_Root,  Input_Opt, State_Chm, &
                                State_Grid, State_Met, OrigUnit, RC )
+
+       if (Input_Opt%IS_FD_SPOT_THIS_PET) THEN
+          write(*,*) 'After Convert_Spc_Units back to ', trim(origunit),   &
+               State_Chm%SpeciesAdj(Input_Opt%IFD,Input_Opt%JFD,Input_Opt%LFD,Input_opt%NFD)
+       ENDIF       
        
        ! Error handling
        IF ( RC /= GC_SUCCESS ) THEN
