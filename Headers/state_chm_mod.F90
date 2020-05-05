@@ -112,6 +112,7 @@ MODULE State_Chm_Mod
 
 #ifdef ADJOINT
      REAL(fp),          POINTER :: SpeciesAdj (:,:,:,:) ! Species adjoint variables
+     REAL(fp),          POINTER :: CostFuncMask(:,:,:)  ! cost function volume mask
 #endif
 
      !----------------------------------------------------------------------
@@ -435,6 +436,7 @@ CONTAINS
 #ifdef ADJOINT
     ! Chemical species adjoint variables
     State_Chm%SpeciesAdj    => NULL()
+    State_Chm%CostFuncMask  => NULL()
 #endif
 
     ! Boundary conditions
@@ -841,6 +843,16 @@ CONTAINS
     State_Chm%SpeciesAdj = 0.0_fp
     CALL Register_ChmField( am_I_Root, chmID, State_Chm%SpeciesAdj, State_Chm, RC )
     CALL GC_CheckVar( 'State_Chm%SpeciesAdj', 1, RC )
+    IF ( RC /= GC_SUCCESS ) RETURN
+
+    ! Cost function mask
+    chmID = 'CostFuncMask'
+    ALLOCATE( State_Chm%CostFuncMask( IM, JM, LM ), STAT=RC )
+    CALL GC_CheckVar( 'State_Chm%CostFuncMask', 0, RC )
+    IF ( RC /= GC_SUCCESS ) RETURN
+    State_Chm%CostFuncMask = 1.0_fp ! default to evaluating cost function everywhere
+    CALL Register_ChmField( am_I_Root, chmID, State_Chm%CostFuncMask, State_Chm, RC )
+    CALL GC_CheckVar( 'State_Chm%CostFuncMask', 1, RC )
     IF ( RC /= GC_SUCCESS ) RETURN
 #endif
 
@@ -2257,6 +2269,10 @@ CONTAINS
           IF ( isUnits   ) Units = 'varies'
           IF ( isRank    ) Rank  = 3
           IF ( isSpecies ) PerSpecies = 'ALL'
+       CASE ( 'COSTFUNCMASK' )
+          IF ( isDesc    ) Desc  = 'Cost function volume mask'
+          IF ( isUnits   ) Units = 'none'
+          IF ( isRank    ) Rank  = 3
 #endif
        CASE( 'BOUNDARYCOND' )
           IF ( isDesc    ) Desc  = 'Boundary conditions for species'
